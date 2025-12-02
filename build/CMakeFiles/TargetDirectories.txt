@@ -1,0 +1,4 @@
+/home/mihnea/MySSH/build/CMakeFiles/server.dir
+/home/mihnea/MySSH/build/CMakeFiles/client.dir
+/home/mihnea/MySSH/build/CMakeFiles/edit_cache.dir
+/home/mihnea/MySSH/build/CMakeFiles/rebuild_cache.dir
