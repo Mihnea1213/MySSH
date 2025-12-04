@@ -144,8 +144,39 @@ void handle_client(int client_sock)
         //Logam comanda (pentru debug)
         std::cout << "[Child Process] Execut:" << command << std::endl;
         
-        //Executam comanda
-        std::string output = execute_command(command.c_str());
+        std::string output;
+
+        //Verificam daca comanda incepe cu "cd"
+        //strncmp returneaza 0 daca sirurile sunt identice pe primii n bytes
+        if (strncmp(command.c_str(), "cd" , 2) == 0)
+        {
+            //Extragem calea (ignoram primele 3 caractere: "cd ")
+            std::string path;
+
+            if (command.length() > 3)
+            {
+                path = command.substr(3); //Luam tot ce e dupa "cd"
+            }
+            else
+            {
+                path = getenv("HOME"); //Daca scrii doar "cd", te duce in Home
+            }
+
+            //Incercam sa schimbam directorul
+            if(chdir(path.c_str()) == 0)
+            {
+                output = ""; //Succes, nu afisam nimic
+            }
+            else
+            {
+                output = "Eroare: Nu s-a putut schimba directorul (Path invalid?)\n";
+            }
+        }
+        else
+        {
+            //Daca NU este cd, o executam cu execute_command
+            output = execute_command(command.c_str());
+        }
 
         //Verificam daca output-ul e gol
         //Trebuie sa intoarcem ceva in cazul in care comanda nu afiseaza nimic
