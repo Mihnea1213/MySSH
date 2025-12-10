@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/mihnea/MySSH/include
+CXX_INCLUDES = -I/home/mihnea/MySSH/include -I/home/mihnea/MySSH/src/common
 
 CXX_FLAGS = 
 

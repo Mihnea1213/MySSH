@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/mihnea/MySSH/src/client/main.cpp" "CMakeFiles/client.dir/src/client/main.cpp.o" "gcc" "CMakeFiles/client.dir/src/client/main.cpp.o.d"
+  "/home/mihnea/MySSH/src/common/utils.cpp" "CMakeFiles/client.dir/src/common/utils.cpp.o" "gcc" "CMakeFiles/client.dir/src/common/utils.cpp.o.d"
   )
 
 # Targets to which this target links.

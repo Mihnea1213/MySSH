@@ -11,6 +11,8 @@
 #include <unistd.h> //Pentru read,write,close
 #include <cstring> //Pentru manipularea memorie (memset, strlen)
 #include <string> //Pentru clasa std::string
+#include "../common/utils.h" //Pentru send_packet,receive_packet
+#include "../common/protocol.h" //Pentru MessageType
 
 //Portul
 #define PORT 2728
@@ -87,36 +89,27 @@ int main()
             continue;
         }
 
-        //Trimitem string-ul catre server: send(socket, pointer_la_date, lungime_date, flaguri)
-        int bytes_sent = send(sock, msg.c_str(), msg.length(), 0);
-        if (bytes_sent<0)
+        //Trimitem comanda impachetata (Tipul CMD_EXEC)
+        if(!send_packet(sock,MessageType::CMD_EXEC,msg))
         {
-            std::cout <<"[Eroare] Nu s-a putut trimite mesajul la server.\n";
+            std::cout << "[Eroare] Nu s-a putut trimite mesajul la server.\n";
             break;
         }
 
-        //Curatare buffer
-        memset(buffer,0,sizeof(buffer));
+        //Asteptam raspunsul impachetat
+        MessageType type;
+        std::string response;
 
-        //Receptie: read() o sa "opreasca" programul client pana cand serverul trimite ceva inapoi.
-        int valread = read(sock,buffer,sizeof(buffer) - 1);
-
-        if (valread > 0)
+        if(!receive_packet(sock,type,response))
         {
-            //S-a primit ceva si trebuie afisat.
-            std::cout << buffer << std::endl;
-        }
-        else if(valread == 0)
-        {
-            //Daca read intoarce 0 , inseamna ca serverul a inchis conexiunea (FIN)
             std::cout << "Serverul a inchis conexiunea." << std::endl;
             break;
         }
-        else
+
+        //Verificam ce am primit
+        if(type == MessageType::CMD_OUTPUT||type == MessageType::CMD_ERROR)
         {
-            //Eroare daca primim -1.
-            std::cout << "[Eroare] Eroare la citirea din socket.\n";
-            break;
+            std::cout << response << std::endl;
         }
     }
 

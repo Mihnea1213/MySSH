@@ -166,6 +166,33 @@ src/client/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/client/main.cpp.s
 .PHONY : src/client/main.cpp.s
 
+src/common/utils.o: src/common/utils.cpp.o
+.PHONY : src/common/utils.o
+
+# target to build an object file
+src/common/utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/utils.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/utils.cpp.o
+.PHONY : src/common/utils.cpp.o
+
+src/common/utils.i: src/common/utils.cpp.i
+.PHONY : src/common/utils.i
+
+# target to preprocess a source file
+src/common/utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/utils.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/utils.cpp.i
+.PHONY : src/common/utils.cpp.i
+
+src/common/utils.s: src/common/utils.cpp.s
+.PHONY : src/common/utils.s
+
+# target to generate assembly for a file
+src/common/utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/utils.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/utils.cpp.s
+.PHONY : src/common/utils.cpp.s
+
 src/server/main.o: src/server/main.cpp.o
 .PHONY : src/server/main.o
 
@@ -203,6 +230,9 @@ help:
 	@echo "... src/client/main.o"
 	@echo "... src/client/main.i"
 	@echo "... src/client/main.s"
+	@echo "... src/common/utils.o"
+	@echo "... src/common/utils.i"
+	@echo "... src/common/utils.s"
 	@echo "... src/server/main.o"
 	@echo "... src/server/main.i"
 	@echo "... src/server/main.s"

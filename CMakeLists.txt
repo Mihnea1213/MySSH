@@ -14,7 +14,7 @@ find_package(OpenSSL REQUIRED)
 
 #Includerea Header-elor (.h)
 #Folosit pentru organizarea mai buna a codului
-include_directories(include)
+include_directories(include src/common)
 
 #!!!SERVERUL
 
@@ -23,7 +23,7 @@ include_directories(include)
 #Aceasta comanda ia fisierele .cpp si le transforma in executabilul final "server".
 add_executable(server
     src/server/main.cpp    
-
+    src/common/utils.cpp
 )
 
 #Link-uiesc serverul cu bibliotecile necesare
@@ -36,7 +36,7 @@ target_link_libraries(server OpenSSL::SSL OpenSSL::Crypto pthread)
 #La fel ca mai sus, creez un program separat "client"
 add_executable(client
     src/client/main.cpp
-
+    src/common/utils.cpp
 )
 
 #Link-uiesc clientul cu bibliotecile necesare

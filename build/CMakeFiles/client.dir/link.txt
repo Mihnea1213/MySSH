@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/client.dir/src/client/main.cpp.o -o client  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lpthread 
+/usr/bin/c++ CMakeFiles/client.dir/src/client/main.cpp.o CMakeFiles/client.dir/src/common/utils.cpp.o -o client  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lpthread 
