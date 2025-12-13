@@ -13,6 +13,8 @@
 #include <vector> //Necesar pentru std::vector
 #include <sstream> //Necesar pentru std::stringsteam 
 #include <fcntl.h> //opne, O_CREAT,O_WRONLY, etc.
+#include <glob.h> //Pnetru procesare *
+#include <signal.h> //Pentru resetarea semnalelor
 #include "../common/utils.h" //Pentru send_packet,receive_packet
 #include "../common/protocol.h" //Pentru MessageType
 
@@ -28,6 +30,57 @@ std::string trim(const std::string& str)
     }
     size_t last = str.find_last_not_of(" \t\n\r");
     return str.substr(first, (last-first+1));
+}
+
+//FUnctie care transforma "*" in lista de fisiere
+std::vector<std::string> expand_wildcards(const std::vector<std::string>& args)
+{
+    std::vector<std::string> expanded_args;
+    for (const auto& arg : args)
+    {
+        //Daca argumentul contine * sau ?, il expandam
+        if(arg.find('*') != std::string::npos || arg.find('?') != std::string::npos || arg.front() == '~')
+        {
+            glob_t glob_result;
+            memset(&glob_result, 0 , sizeof(glob_result));
+            //GLOB_NOCHECK: Daca nu gaseste nimic, lasa argumentul asa cum e
+            //GLOB_TILDE: Expandeaza si ~ catre home directory
+            int return_value = glob(arg.c_str(), GLOB_TILDE | GLOB_NOCHECK, NULL, &glob_result);
+
+            if (return_value == 0)
+            {
+                for (size_t i = 0 ; i < glob_result.gl_pathc; i++)
+                {
+                    expanded_args.push_back(std::string(glob_result.gl_pathv[i]));
+                }
+            }
+            else
+            {
+                expanded_args.push_back(arg);
+            }
+            globfree(&glob_result);
+        }
+        else
+        {
+            expanded_args.push_back(arg);
+        }
+    }
+    return expanded_args;
+}
+
+//Functia care scoate ghilimelele de la inceput si final
+std::string strip_quotes(const std::string& str)
+{
+    if (str.length() >= 2)
+    {
+        char first = str.front();
+        char last = str.back();
+        //Verificam ghilimele duble sau simple
+        if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+            return str.substr(1, str.length() - 2);
+        }
+    }
+    return str;
 }
 
 //Spargem un string dupa un delimitator (ex: "cmd1 | cmd2" -> {"cmd1", "cmd2"})
@@ -72,11 +125,11 @@ int execute_single_binary(const std::string& cmd_str)
     {
         if(temp_parts[i] == "<" && i+1 < temp_parts.size())
         {
-            info.input_file = temp_parts[++i];
+            info.input_file = strip_quotes(temp_parts[++i]);
         }
         else if (temp_parts[i] == ">" && i+1 < temp_parts.size())
         {
-            info.output_file = temp_parts[++i];
+            info.output_file = strip_quotes(temp_parts[++i]);
             info.append_out = false;
         }
         else if (temp_parts[i] == ">>" && i+1 < temp_parts.size())
@@ -86,11 +139,11 @@ int execute_single_binary(const std::string& cmd_str)
         }
         else if (temp_parts[i] == "2>" && i+1 < temp_parts.size())
         {
-            info.error_file = temp_parts[++i];
+            info.error_file = strip_quotes(temp_parts[++i]);
         }
         else
         {
-            info.args.push_back(temp_parts[i]);
+            info.args.push_back(strip_quotes(temp_parts[i]));
         }
     }
 
@@ -155,9 +208,11 @@ int execute_single_binary(const std::string& cmd_str)
             close(fd);
         }
 
+        std::vector<std::string> expanded_args = expand_wildcards(info.args);
+
         //Convertim vector<string> in char* argv[]
         std::vector<char*> c_args;
-        for(const auto& arg : info.args)
+        for(const auto& arg : expanded_args)
         {
             c_args.push_back(const_cast<char*>(arg.c_str()));
         }
@@ -358,6 +413,8 @@ std::string execute_command(const char* cmd)
         //Proces supervisor (temporar)
         //Acest proces exista doar pentru a executa comnzile si a le
         //trimite output-ul in pipe-ul principal.
+        //De asemenea, resetam handlerul pentru SIGCHLD pentru a evita deadlocks
+        signal(SIGCHLD, SIG_DFL);
         close(pipefd[0]); //Inchidem citirea
         dup2(pipefd[1], STDOUT_FILENO);// Redirectionam stdout in pipe
         dup2(pipefd[1], STDERR_FILENO); // Redirectionam stderr in pipe
@@ -429,7 +486,6 @@ void handle_client(int client_sock)
 
             std::cout << "[Child Process] Execut: " << command << std::endl;
 
-            //TODO Parser
             std::string output;
 
             //Tratare speciala CD
@@ -444,6 +500,8 @@ void handle_client(int client_sock)
                 {
                     path = getenv("HOME");
                 }
+
+                path = strip_quotes(trim(path));
 
                 if(chdir(path.c_str()) == 0)
                 {
