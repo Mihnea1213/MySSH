@@ -15,10 +15,54 @@
 #include <fcntl.h> //opne, O_CREAT,O_WRONLY, etc.
 #include <glob.h> //Pnetru procesare *
 #include <signal.h> //Pentru resetarea semnalelor
+#include <sys/resource.h> //Pentru setrlimit (Resource Governance)
+#include <fstream> //Pentru fisiere log (Audit)
+#include <chrono> //Pentru timestamp
+#include <iomanip> //Pentru formatare timp
+#include <limits.h> //Pentru PATH_MAX
 #include "../common/utils.h" //Pentru send_packet,receive_packet
 #include "../common/protocol.h" //Pentru MessageType
 
 #define PORT 2728
+
+//Variabila globala pentru calea absoluta a log-ului
+std::string server_log_path;
+
+//Modul auditare: Scrie actiunile intr-un fisier jurnal pe server
+void log_audit(const std::string& ip, const std::string& action, const std::string& details)
+{
+    //DEschidem fisierul in mod append
+    std::ofstream log_file(server_log_path, std::ios::app);
+
+    if (log_file.is_open())
+    {
+        //Obtinem timpul curent
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+        log_file << "[" << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M:%S") << "] "
+                 << "IP: " << ip << " | "
+                 << "ACTION: " << action << " | "
+                 << "CMD: " << details << "\n";
+
+                 log_file.flush();
+    }
+}
+
+//Modul Resource Governance: Previne atacurile de tip Fork Bomb sau consum excesiv de memorie
+void setup_resource_limits()
+{
+    struct rlimit rl;
+    //Limita = Numar maxim de procese copil
+    //Setam la 4096
+    rl.rlim_cur= 4096;
+    rl.rlim_max= 4096;
+    if(setrlimit(RLIMIT_NPROC, &rl) != 0)
+    {
+        //Nu dam exit, doar avertizam in consola serverului
+        perror("[Warning] Failed to set NPROC limit");
+    }
+}
 
 //Elimina spatiile de la inceput si final
 std::string trim(const std::string& str)
@@ -414,6 +458,8 @@ std::string execute_command(const char* cmd)
         //Acest proces exista doar pentru a executa comnzile si a le
         //trimite output-ul in pipe-ul principal.
         //De asemenea, resetam handlerul pentru SIGCHLD pentru a evita deadlocks
+        //Activam si limitarea resurselor in procesul SUpervisor , iar copiii o sa mosteneasca limita
+        setup_resource_limits();
         signal(SIGCHLD, SIG_DFL);
         close(pipefd[0]); //Inchidem citirea
         dup2(pipefd[1], STDOUT_FILENO);// Redirectionam stdout in pipe
@@ -457,7 +503,7 @@ void sigchld_handler(int s)
 }
 
 //Aceasta functie ruleaza in procesul COPIL creat in main()
-void handle_client(int client_sock)
+void handle_client(int client_sock, std::string client_ip)
 {
     MessageType type;
     std::string payload;
@@ -470,6 +516,7 @@ void handle_client(int client_sock)
         if(!receive_packet(client_sock,type,payload))
         {
             std::cout << "[Child Process] Clientul s-a deconectat sau eroare protocol." << std::endl;
+            log_audit(client_ip, "DISCONNECT", "Session ended");
             break;
         }
 
@@ -485,6 +532,9 @@ void handle_client(int client_sock)
             }
 
             std::cout << "[Child Process] Execut: " << command << std::endl;
+
+            //Logam comanda primita inainte de executie
+            log_audit(client_ip, "EXEC", command);
 
             std::string output;
 
@@ -537,6 +587,18 @@ int main()
     int opt = 1;
     int addrlen = sizeof(address);
 
+    //Determinam directorul curent la pornire si salvam calea absoluta catrea log.
+    char cwd[PATH_MAX];
+    if(getcwd(cwd,sizeof(cwd)) != NULL)
+    {
+        server_log_path = std::string(cwd) + "/server_audit.log";
+        std::cout << "[Audit] Logging to: " << server_log_path << std::endl;
+    }
+    else
+    {
+        server_log_path = "server_audit.log"; // Fallback
+    }
+
     //Creare socket (IPv4, TCP)
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -587,6 +649,8 @@ int main()
     //Bucla Principala (Accept Loop)
     while (true)
     {
+        //Resetam addrlen la fiecare conexiune noua! Altfel, la a doua conexiune, accept primeste o dimensiune gresita si scrie gunoi in IP.
+        addrlen = sizeof(address);
         //Blocat: Asteapta un client nou
         if((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
         {
@@ -594,7 +658,12 @@ int main()
             continue;
         }
 
-        std::cout << "[Server] Conexiune noua de la: " << inet_ntoa(address.sin_addr) << std::endl;
+        //Obtinem IP-ul clientului ca string folosind inet_ntoa
+        std::string ip_str = inet_ntoa(address.sin_addr);
+        std::cout << "[Server] Conexiune noua de la: " << ip_str << std::endl;
+
+        //Logam conexiunea noua
+        log_audit(std::string(ip_str), "CONNECT", "New session established");
 
         //FORK (Crearea procesului pentru client)
         pid_t pid = fork();
@@ -610,7 +679,7 @@ int main()
             close(server_fd);
 
             //Copilul se ocupa doar de acest client
-            handle_client(new_socket);
+            handle_client(new_socket, std::string(ip_str));
 
             //Cand handle_client se termina, copilul moare
             exit(0);
