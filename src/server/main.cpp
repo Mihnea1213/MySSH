@@ -20,13 +20,17 @@
 #include <chrono> //Pentru timestamp
 #include <iomanip> //Pentru formatare timp
 #include <limits.h> //Pentru PATH_MAX
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "../common/utils.h" //Pentru send_packet,receive_packet
 #include "../common/protocol.h" //Pentru MessageType
+#include "../common/crypto.h"
 
 #define PORT 2728
 
 //Variabila globala pentru calea absoluta a log-ului
 std::string server_log_path;
+SSL_CTX* ctx = nullptr; //Contextul SSL Global
 
 //Modul auditare: Scrie actiunile intr-un fisier jurnal pe server
 void log_audit(const std::string& ip, const std::string& action, const std::string& details)
@@ -209,7 +213,7 @@ int execute_single_binary(const std::string& cmd_str)
         return 0;
     }
 
-    //FOrk pentru executia efectiva
+    //Fork pentru executia efectiva
     pid_t pid = fork();
     if (pid == 0)
     {
@@ -503,7 +507,7 @@ void sigchld_handler(int s)
 }
 
 //Aceasta functie ruleaza in procesul COPIL creat in main()
-void handle_client(int client_sock, std::string client_ip)
+void handle_client(/*int client_sock*/ SSL* ssl, std::string client_ip)
 {
     MessageType type;
     std::string payload;
@@ -513,7 +517,7 @@ void handle_client(int client_sock, std::string client_ip)
     {
         //Folosim receive_packet 
         //Functia asta se ocupa de lungime si tip
-        if(!receive_packet(client_sock,type,payload))
+        if(!receive_packet(/*client_sock*/ ssl,type,payload))
         {
             std::cout << "[Child Process] Clientul s-a deconectat sau eroare protocol." << std::endl;
             log_audit(client_ip, "DISCONNECT", "Session ended");
@@ -573,15 +577,22 @@ void handle_client(int client_sock, std::string client_ip)
             }
 
             //Trimitem raspunsul inapoi impachetat
-            send_packet(client_sock, MessageType::CMD_OUTPUT, output);
+            send_packet(/*client_sock*/ ssl, MessageType::CMD_OUTPUT, output);
         }
     }
     //Inchidem socket-ul cand iesim din bucla
-    close(client_sock);
+    //close(client_sock);
+    //Doar daca facem fara criptare
 }
 
 int main()
 {
+    //Initializare OpenSSl
+    Crypto::init();
+
+    //Creare COntext Server + Incarcare CHei
+    ctx = Crypto::create_context(true);
+    Crypto::configure_context(ctx, "../keys/server_cert.pem", "../keys/server_key.pem");
     int server_fd, new_socket;
     struct sockaddr_in address;
     int opt = 1;
@@ -678,9 +689,26 @@ int main()
             //Copilul nu are nevoie sa asculte dupa alti clienti
             close(server_fd);
 
+            //!!!START SSL HANDSHAKE (In copil)
+            SSL* ssl = SSL_new(ctx); //Cream o structura SSL
+            SSL_set_fd(ssl, new_socket); // O legam de socket
+            if(SSL_accept(ssl) <= 0) //Asteptam ca clientul sa inceapa negocierea
+            {
+                std::cerr << "[Eroare] SSL Handshake esuat cu " <<ip_str << "\n";
+                Crypto::log_ssl_error("SSL_accept");
+            }
+            else
+            {
+                //Daca negocierea reuseste, intram in bucla de comenzi
+                handle_client(ssl, ip_str);
+            }
             //Copilul se ocupa doar de acest client
-            handle_client(new_socket, std::string(ip_str));
+            //handle_client(new_socket, std::string(ip_str)); ...asta daca lucram fara criptare
 
+            //Curatenie Copil
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            close(new_socket);
             //Cand handle_client se termina, copilul moare
             exit(0);
         }
@@ -693,5 +721,9 @@ int main()
             //Parintele se intoarce la inceputul buclei while sa astepte urmatorul client
         }
     }
+
+    //Curatenie Parinte (teoretic unreachable code in while (true))
+    SSL_CTX_free(ctx);
+    Crypto::cleanup();
     return 0;
 }

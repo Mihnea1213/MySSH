@@ -11,8 +11,11 @@
 #include <unistd.h> //Pentru read,write,close
 #include <cstring> //Pentru manipularea memorie (memset, strlen)
 #include <string> //Pentru clasa std::string
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "../common/utils.h" //Pentru send_packet,receive_packet
 #include "../common/protocol.h" //Pentru MessageType
+#include "../common/crypto.h" //Pentru criptare
 
 //Portul
 #define PORT 2728
@@ -23,11 +26,18 @@
 
 int main()
 {
+    //Initializam Libraria Criptografica
+    Crypto::init();
+
+    //Creare COntext SSL (Client Mode)
+    //Contextul tine minte regulile generale de criptare (ex: TLS 1.3)
+    SSL_CTX* ctx = Crypto::create_context(false);
+
     int sock = 0;
     struct sockaddr_in serv_addr; //Structura care tine detaliile despre unde ne conectam
 
     //Buffer-ul in care vom stoca raspunsul primit de la server.
-    char buffer[4096] = {0};
+    //char buffer[4096] = {0};
 
     //Creare Socket
     //AF_INET = Folosim IPv4
@@ -40,7 +50,7 @@ int main()
     }
 
     //Curatam structura de memorie
-    memset(&serv_addr, 0 , sizeof(serv_addr));
+    //memset(&serv_addr, 0 , sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET; // Setam familia de adrese la IPv4
 
@@ -61,9 +71,27 @@ int main()
         std::cout << "\n[Eroare] Conexiunea a esuat. Verificam daca serverul este pornit!\n";
         return -1;
     }
+    //!!!Start Criptare (Handshake)
+    //Cream o structura SSL specifica pentru aceasta conexiune
+    SSL* ssl = SSL_new(ctx);
 
-    std::cout << "---Conectat la MySSH Server! ---\n";
-    std::cout << "Scrie comenzi shell (ex: ls, pwd, whoami). Scrie 'exit' pentru a iesi.\n";
+    //Legam structura SSL de socket-ul TCP existent
+    SSL_set_fd(ssl, sock);
+
+    //Initiem negocierea securizata cu serverul
+    //Aici se verifica certificatele si se genereaza cheile de sesiune
+    if (SSL_connect(ssl) <= 0)
+    {
+        std::cout << "[Eroare Fatala] SSL Handshake Failed! (Criptarea a esuat)\n";
+        Crypto::log_ssl_error("SSL_connect");
+        SSL_free(ssl);
+        close(sock);
+        return -1;
+    }
+
+    std::cout << "--- Conectat SECURIZAT la MySSH Server! ---\n";
+    std::cout << "Criptare activa: " << SSL_get_cipher(ssl) << "\n"; // Afisam algoritmul folosit (ex: AES-256)
+    std::cout << "Scrie comenzi shell (ex: ls, pwd). Scrie 'exit' pentru a iesi.\n";
 
     //Bucla de comunicare
     while(true)
@@ -90,7 +118,13 @@ int main()
         }
 
         //Trimitem comanda impachetata (Tipul CMD_EXEC)
-        if(!send_packet(sock,MessageType::CMD_EXEC,msg))
+        /*if(!send_packet(sock,MessageType::CMD_EXEC,msg))
+        {
+            std::cout << "[Eroare] Nu s-a putut trimite mesajul la server.\n";
+            break;
+        }*/
+       //doar ca acum trimitem pointer-ul ssl in loc de 'sock'
+       if(!send_packet(ssl,MessageType::CMD_EXEC,msg))
         {
             std::cout << "[Eroare] Nu s-a putut trimite mesajul la server.\n";
             break;
@@ -100,7 +134,7 @@ int main()
         MessageType type;
         std::string response;
 
-        if(!receive_packet(sock,type,response))
+        if(!receive_packet(/*sock*/ ssl,type,response))
         {
             std::cout << "Serverul a inchis conexiunea." << std::endl;
             break;
@@ -115,5 +149,12 @@ int main()
 
     //Inchidem socket-ul
     close(sock);
+
+    //Inchidem canalul SSL daca facem cu criptare (trimite alerta de close_notify)
+    SSL_shutdown(ssl);
+    SSL_free(ssl); //Eliberam memoria SSL
+    SSL_CTX_free(ctx); //Eliberam contextul general
+    Crypto::cleanup(); //Eliberam libraria
+    
     return 0;
 }
