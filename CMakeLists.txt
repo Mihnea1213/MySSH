@@ -25,7 +25,6 @@ add_executable(server
     src/server/main.cpp    
     src/common/utils.cpp
     src/common/crypto.cpp
-    src/common/protocol.cpp
 )
 
 #Link-uiesc serverul cu bibliotecile necesare
@@ -40,7 +39,6 @@ add_executable(client
     src/client/main.cpp
     src/common/utils.cpp
     src/common/crypto.cpp
-    src/common/protocol.cpp
 )
 
 #Link-uiesc clientul cu bibliotecile necesare

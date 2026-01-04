@@ -561,9 +561,6 @@ CMakeFiles/client.dir/src/common/crypto.cpp.o: ../src/common/crypto.cpp \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc
 
-CMakeFiles/client.dir/src/common/protocol.cpp.o: ../src/common/protocol.cpp \
-  /usr/include/stdc-predef.h
-
 CMakeFiles/client.dir/src/common/utils.cpp.o: ../src/common/utils.cpp \
   /usr/include/stdc-predef.h \
   ../src/common/utils.h \
@@ -1210,8 +1207,6 @@ CMakeFiles/client.dir/src/common/utils.cpp.o: ../src/common/utils.cpp \
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
 
 /usr/include/c++/11/typeinfo:
-
-../src/common/protocol.cpp:
 
 /usr/include/c++/11/bits/move.h:
 

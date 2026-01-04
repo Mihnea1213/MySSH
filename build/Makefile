@@ -193,33 +193,6 @@ src/common/crypto.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/crypto.cpp.s
 .PHONY : src/common/crypto.cpp.s
 
-src/common/protocol.o: src/common/protocol.cpp.o
-.PHONY : src/common/protocol.o
-
-# target to build an object file
-src/common/protocol.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/protocol.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/protocol.cpp.o
-.PHONY : src/common/protocol.cpp.o
-
-src/common/protocol.i: src/common/protocol.cpp.i
-.PHONY : src/common/protocol.i
-
-# target to preprocess a source file
-src/common/protocol.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/protocol.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/protocol.cpp.i
-.PHONY : src/common/protocol.cpp.i
-
-src/common/protocol.s: src/common/protocol.cpp.s
-.PHONY : src/common/protocol.s
-
-# target to generate assembly for a file
-src/common/protocol.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/src/common/protocol.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/src/common/protocol.cpp.s
-.PHONY : src/common/protocol.cpp.s
-
 src/common/utils.o: src/common/utils.cpp.o
 .PHONY : src/common/utils.o
 
@@ -287,9 +260,6 @@ help:
 	@echo "... src/common/crypto.o"
 	@echo "... src/common/crypto.i"
 	@echo "... src/common/crypto.s"
-	@echo "... src/common/protocol.o"
-	@echo "... src/common/protocol.i"
-	@echo "... src/common/protocol.s"
 	@echo "... src/common/utils.o"
 	@echo "... src/common/utils.i"
 	@echo "... src/common/utils.s"

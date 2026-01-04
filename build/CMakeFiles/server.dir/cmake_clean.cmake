@@ -1,8 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/server.dir/src/common/crypto.cpp.o"
   "CMakeFiles/server.dir/src/common/crypto.cpp.o.d"
-  "CMakeFiles/server.dir/src/common/protocol.cpp.o"
-  "CMakeFiles/server.dir/src/common/protocol.cpp.o.d"
   "CMakeFiles/server.dir/src/common/utils.cpp.o"
   "CMakeFiles/server.dir/src/common/utils.cpp.o.d"
   "CMakeFiles/server.dir/src/server/main.cpp.o"

@@ -28,9 +28,18 @@
 
 #define PORT 2728
 
+//Culori
+const std::string RED     = "\033[31m";
+const std::string GREEN   = "\033[32m";
+const std::string YELLOW  = "\033[33m";
+const std::string BLUE    = "\033[34m";
+const std::string RESET   = "\033[0m";
+
 //Variabila globala pentru calea absoluta a log-ului
 std::string server_log_path;
 SSL_CTX* ctx = nullptr; //Contextul SSL Global
+
+void clear_screen() { std::cout << "\033[2J\033[1;1H"; }
 
 //Modul auditare: Scrie actiunile intr-un fisier jurnal pe server
 void log_audit(const std::string& ip, const std::string& action, const std::string& details)
@@ -49,7 +58,7 @@ void log_audit(const std::string& ip, const std::string& action, const std::stri
                  << "ACTION: " << action << " | "
                  << "CMD: " << details << "\n";
 
-                 log_file.flush();
+        log_file.flush();
     }
 }
 
@@ -512,7 +521,7 @@ bool check_credentials(const std::string& input_user, const std::string& input_p
     std::ifstream user_file("users.txt");
     if(!user_file.is_open())
     {
-        std::cerr << "[Eroare] Nu am gasit fisierul users.txt!\n";
+        std::cerr << RED << "[Eroare] Nu am gasit fisierul users.txt!\n" << RESET;
         return false;
     }
 
@@ -536,12 +545,10 @@ void handle_client(int sock, std::string client_ip)
 {
     MessageType type;
     std::string payload;
-    std::cout << "[Child Process] Client conectat. Astept comenzi..."<< std::endl;
-
     //AUTENTIFICARE
     //Asteptam primul pachet sa fie neaparat AUTH_REQ
-    std::cout << "[Auth] Astept credențialele de la " << client_ip << "...\n";
-    
+    std::cout << BLUE << "[Child] Client conectat (" << client_ip << "). Astept auth...\n" << RESET;
+
     #ifdef USE_SSL
     if(!receive_packet(ssl,type,payload))
     {
@@ -565,39 +572,25 @@ void handle_client(int sock, std::string client_ip)
     std::string user, pass;
     ss >> user >> pass;
 
-    if(user.empty() || pass.empty())
-    {
-        std::cout << "[Auth] Eroare: Format invalid (lipseste user sau parola).\n";
-        return;
-    }
-
-    //Verificam in baza de date (users.txt)
-    bool auth_success = check_credentials(user,pass);
-
-    if(auth_success)
-    {
-        std::cout << "[Auth] Succes! Utilizator conectat: " << user << "\n";
-        log_audit(client_ip, "AUTH", "Login successful as " + user);
+    if(check_credentials(user,pass)) {
+        std::cout << GREEN << "[Auth] Succes! User: " << user << " (" << client_ip << ")\n" << RESET;
+        log_audit(client_ip, "AUTH", "Login success: " + user);
         #ifdef USE_SSL
         send_packet(ssl , MessageType::AUTH_RESP, "OK");
         #else
         send_packet(sock , MessageType::AUTH_RESP, "OK");
         #endif
-    }
-    else
-    {
-        std::cout << "[Auth] Eșec pentru " << client_ip << " (User: " << user << ")\n";
-        log_audit(client_ip, "AUTH", "Login failed for " + user);
+    } 
+    else {
+        std::cout << RED << "[Auth] Esec! User: " << user << " (" << client_ip << ")\n" << RESET;
+        log_audit(client_ip, "AUTH", "Login failed: " + user);
         #ifdef USE_SSL
         send_packet(ssl , MessageType::AUTH_RESP, "FAIL");
         #else
         send_packet(sock , MessageType::AUTH_RESP, "FAIL");
         #endif
-
-        return; //DEconectam clientul imediat
+        return;
     }
-
-    std::cout << "[Child Process] Sesiune activa. Astept comenzi..."<< std::endl;
 
     while (true)
     {
@@ -609,7 +602,7 @@ void handle_client(int sock, std::string client_ip)
         if(!receive_packet(sock,type,payload))
         #endif
         {
-            std::cout << "[Child Process] Clientul s-a deconectat sau eroare protocol." << std::endl;
+            std::cout << YELLOW << "[Child] Client deconectat (" << user << ").\n" << RESET;
             log_audit(client_ip, "DISCONNECT", "Session ended");
             break;
         }
@@ -625,8 +618,7 @@ void handle_client(int sock, std::string client_ip)
                 continue;
             }
 
-            std::cout << "[Child Process] Execut: " << command << std::endl;
-
+            std::cout << "[Exec] " << user << ": " << command << std::endl;
             //Logam comanda primita inainte de executie
             log_audit(client_ip, "EXEC", command);
 
@@ -686,6 +678,7 @@ void handle_client(int sock, std::string client_ip)
 
 int main()
 {
+    clear_screen();
     #ifdef USE_SSL
     //Initializare OpenSSl
     Crypto::init();
@@ -693,9 +686,9 @@ int main()
     //Creare COntext Server + Incarcare CHei
     ctx = Crypto::create_context(true);
     Crypto::configure_context(ctx, "../keys/server_cert.pem", "../keys/server_key.pem");
-    std::cout << "[Info] Modul SECURIZE (SSL) Activat.\n";
+    std::cout << GREEN << "[Info] Modul SECURIZAT (SSL) Activat.\n" << RESET;
     #else
-    std::cout << "[Info] Modul NECRIPTAT (Standard TCP) Activat.\n";
+    std::cout << RED << "[Info] Modul NECRIPTAT (Standard TCP) Activat.\n" << RESET;
     #endif
 
     int server_fd, new_socket;
@@ -760,8 +753,8 @@ int main()
         exit(1);
     }
 
-    std::cout << "[Server] Astept conexiuni pe portul " << PORT << "..." << std::endl;
-
+    std::cout << BLUE << "[Server] Astept conexiuni pe portul " << PORT << "...\n" << RESET;
+    
     //Bucla Principala (Accept Loop)
     while (true)
     {
@@ -776,8 +769,6 @@ int main()
 
         //Obtinem IP-ul clientului ca string folosind inet_ntoa
         std::string ip_str = inet_ntoa(address.sin_addr);
-        std::cout << "[Server] Conexiune noua de la: " << ip_str << std::endl;
-
         //Logam conexiunea noua
         log_audit(std::string(ip_str), "CONNECT", "New session established");
 
@@ -800,7 +791,7 @@ int main()
             SSL_set_fd(ssl, new_socket); // O legam de socket
             if(SSL_accept(ssl) <= 0) //Asteptam ca clientul sa inceapa negocierea
             {
-                std::cerr << "[Eroare] SSL Handshake esuat cu " <<ip_str << "\n";
+                std::cerr << RED << "[Eroare] SSL Handshake esuat cu " << ip_str << "\n" << RESET;
                 Crypto::log_ssl_error("SSL_accept");
             }
             else

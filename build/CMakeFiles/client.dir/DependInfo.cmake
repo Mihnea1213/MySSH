@@ -10,7 +10,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/mihnea/Documents/MySSH/src/client/main.cpp" "CMakeFiles/client.dir/src/client/main.cpp.o" "gcc" "CMakeFiles/client.dir/src/client/main.cpp.o.d"
   "/home/mihnea/Documents/MySSH/src/common/crypto.cpp" "CMakeFiles/client.dir/src/common/crypto.cpp.o" "gcc" "CMakeFiles/client.dir/src/common/crypto.cpp.o.d"
-  "/home/mihnea/Documents/MySSH/src/common/protocol.cpp" "CMakeFiles/client.dir/src/common/protocol.cpp.o" "gcc" "CMakeFiles/client.dir/src/common/protocol.cpp.o.d"
   "/home/mihnea/Documents/MySSH/src/common/utils.cpp" "CMakeFiles/client.dir/src/common/utils.cpp.o" "gcc" "CMakeFiles/client.dir/src/common/utils.cpp.o.d"
   )
 

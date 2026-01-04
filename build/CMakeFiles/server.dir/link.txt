@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/server.dir/src/server/main.cpp.o CMakeFiles/server.dir/src/common/utils.cpp.o CMakeFiles/server.dir/src/common/crypto.cpp.o CMakeFiles/server.dir/src/common/protocol.cpp.o -o server  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lpthread 
+/usr/bin/c++ CMakeFiles/server.dir/src/server/main.cpp.o CMakeFiles/server.dir/src/common/utils.cpp.o CMakeFiles/server.dir/src/common/crypto.cpp.o -o server  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lpthread 
