@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/mihnea/MySSH/src/common/crypto.cpp" "CMakeFiles/server.dir/src/common/crypto.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/crypto.cpp.o.d"
-  "/home/mihnea/MySSH/src/common/protocol.cpp" "CMakeFiles/server.dir/src/common/protocol.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/protocol.cpp.o.d"
-  "/home/mihnea/MySSH/src/common/utils.cpp" "CMakeFiles/server.dir/src/common/utils.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/utils.cpp.o.d"
-  "/home/mihnea/MySSH/src/server/main.cpp" "CMakeFiles/server.dir/src/server/main.cpp.o" "gcc" "CMakeFiles/server.dir/src/server/main.cpp.o.d"
+  "/home/mihnea/Documents/MySSH/src/common/crypto.cpp" "CMakeFiles/server.dir/src/common/crypto.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/crypto.cpp.o.d"
+  "/home/mihnea/Documents/MySSH/src/common/protocol.cpp" "CMakeFiles/server.dir/src/common/protocol.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/protocol.cpp.o.d"
+  "/home/mihnea/Documents/MySSH/src/common/utils.cpp" "CMakeFiles/server.dir/src/common/utils.cpp.o" "gcc" "CMakeFiles/server.dir/src/common/utils.cpp.o.d"
+  "/home/mihnea/Documents/MySSH/src/server/main.cpp" "CMakeFiles/server.dir/src/server/main.cpp.o" "gcc" "CMakeFiles/server.dir/src/server/main.cpp.o.d"
   )
 
 # Targets to which this target links.

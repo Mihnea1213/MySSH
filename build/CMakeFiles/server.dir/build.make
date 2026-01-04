@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mihnea/MySSH
+CMAKE_SOURCE_DIR = /home/mihnea/Documents/MySSH
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mihnea/MySSH/build
+CMAKE_BINARY_DIR = /home/mihnea/Documents/MySSH/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/server.dir/depend.make
@@ -72,58 +72,58 @@ include CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/src/server/main.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/src/server/main.cpp.o: ../src/server/main.cpp
 CMakeFiles/server.dir/src/server/main.cpp.o: CMakeFiles/server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/server.dir/src/server/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/server/main.cpp.o -MF CMakeFiles/server.dir/src/server/main.cpp.o.d -o CMakeFiles/server.dir/src/server/main.cpp.o -c /home/mihnea/MySSH/src/server/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/Documents/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/server.dir/src/server/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/server/main.cpp.o -MF CMakeFiles/server.dir/src/server/main.cpp.o.d -o CMakeFiles/server.dir/src/server/main.cpp.o -c /home/mihnea/Documents/MySSH/src/server/main.cpp
 
 CMakeFiles/server.dir/src/server/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/src/server/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/MySSH/src/server/main.cpp > CMakeFiles/server.dir/src/server/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/Documents/MySSH/src/server/main.cpp > CMakeFiles/server.dir/src/server/main.cpp.i
 
 CMakeFiles/server.dir/src/server/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/src/server/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/MySSH/src/server/main.cpp -o CMakeFiles/server.dir/src/server/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/Documents/MySSH/src/server/main.cpp -o CMakeFiles/server.dir/src/server/main.cpp.s
 
 CMakeFiles/server.dir/src/common/utils.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/src/common/utils.cpp.o: ../src/common/utils.cpp
 CMakeFiles/server.dir/src/common/utils.cpp.o: CMakeFiles/server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/server.dir/src/common/utils.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/utils.cpp.o -MF CMakeFiles/server.dir/src/common/utils.cpp.o.d -o CMakeFiles/server.dir/src/common/utils.cpp.o -c /home/mihnea/MySSH/src/common/utils.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/Documents/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/server.dir/src/common/utils.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/utils.cpp.o -MF CMakeFiles/server.dir/src/common/utils.cpp.o.d -o CMakeFiles/server.dir/src/common/utils.cpp.o -c /home/mihnea/Documents/MySSH/src/common/utils.cpp
 
 CMakeFiles/server.dir/src/common/utils.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/src/common/utils.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/MySSH/src/common/utils.cpp > CMakeFiles/server.dir/src/common/utils.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/Documents/MySSH/src/common/utils.cpp > CMakeFiles/server.dir/src/common/utils.cpp.i
 
 CMakeFiles/server.dir/src/common/utils.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/src/common/utils.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/MySSH/src/common/utils.cpp -o CMakeFiles/server.dir/src/common/utils.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/Documents/MySSH/src/common/utils.cpp -o CMakeFiles/server.dir/src/common/utils.cpp.s
 
 CMakeFiles/server.dir/src/common/crypto.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/src/common/crypto.cpp.o: ../src/common/crypto.cpp
 CMakeFiles/server.dir/src/common/crypto.cpp.o: CMakeFiles/server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/server.dir/src/common/crypto.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/crypto.cpp.o -MF CMakeFiles/server.dir/src/common/crypto.cpp.o.d -o CMakeFiles/server.dir/src/common/crypto.cpp.o -c /home/mihnea/MySSH/src/common/crypto.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/Documents/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/server.dir/src/common/crypto.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/crypto.cpp.o -MF CMakeFiles/server.dir/src/common/crypto.cpp.o.d -o CMakeFiles/server.dir/src/common/crypto.cpp.o -c /home/mihnea/Documents/MySSH/src/common/crypto.cpp
 
 CMakeFiles/server.dir/src/common/crypto.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/src/common/crypto.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/MySSH/src/common/crypto.cpp > CMakeFiles/server.dir/src/common/crypto.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/Documents/MySSH/src/common/crypto.cpp > CMakeFiles/server.dir/src/common/crypto.cpp.i
 
 CMakeFiles/server.dir/src/common/crypto.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/src/common/crypto.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/MySSH/src/common/crypto.cpp -o CMakeFiles/server.dir/src/common/crypto.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/Documents/MySSH/src/common/crypto.cpp -o CMakeFiles/server.dir/src/common/crypto.cpp.s
 
 CMakeFiles/server.dir/src/common/protocol.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/src/common/protocol.cpp.o: ../src/common/protocol.cpp
 CMakeFiles/server.dir/src/common/protocol.cpp.o: CMakeFiles/server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/server.dir/src/common/protocol.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/protocol.cpp.o -MF CMakeFiles/server.dir/src/common/protocol.cpp.o.d -o CMakeFiles/server.dir/src/common/protocol.cpp.o -c /home/mihnea/MySSH/src/common/protocol.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mihnea/Documents/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/server.dir/src/common/protocol.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/server.dir/src/common/protocol.cpp.o -MF CMakeFiles/server.dir/src/common/protocol.cpp.o.d -o CMakeFiles/server.dir/src/common/protocol.cpp.o -c /home/mihnea/Documents/MySSH/src/common/protocol.cpp
 
 CMakeFiles/server.dir/src/common/protocol.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/src/common/protocol.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/MySSH/src/common/protocol.cpp > CMakeFiles/server.dir/src/common/protocol.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mihnea/Documents/MySSH/src/common/protocol.cpp > CMakeFiles/server.dir/src/common/protocol.cpp.i
 
 CMakeFiles/server.dir/src/common/protocol.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/src/common/protocol.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/MySSH/src/common/protocol.cpp -o CMakeFiles/server.dir/src/common/protocol.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mihnea/Documents/MySSH/src/common/protocol.cpp -o CMakeFiles/server.dir/src/common/protocol.cpp.s
 
 # Object files for target server
 server_OBJECTS = \
@@ -143,7 +143,7 @@ server: CMakeFiles/server.dir/build.make
 server: /usr/lib/x86_64-linux-gnu/libssl.so
 server: /usr/lib/x86_64-linux-gnu/libcrypto.so
 server: CMakeFiles/server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mihnea/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mihnea/Documents/MySSH/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -155,6 +155,6 @@ CMakeFiles/server.dir/clean:
 .PHONY : CMakeFiles/server.dir/clean
 
 CMakeFiles/server.dir/depend:
-	cd /home/mihnea/MySSH/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/mihnea/MySSH /home/mihnea/MySSH /home/mihnea/MySSH/build /home/mihnea/MySSH/build /home/mihnea/MySSH/build/CMakeFiles/server.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/mihnea/Documents/MySSH/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/mihnea/Documents/MySSH /home/mihnea/Documents/MySSH /home/mihnea/Documents/MySSH/build /home/mihnea/Documents/MySSH/build /home/mihnea/Documents/MySSH/build/CMakeFiles/server.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/server.dir/depend
 

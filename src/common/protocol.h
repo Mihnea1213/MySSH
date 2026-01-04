@@ -4,7 +4,7 @@
 #include <cstdint> //Pentru uint32_t, uint8_t
 
 //INTRERUPERE PRINCIPALA A CRIPTARII (daca se comenteaza aceasta linie, criptarea o sa fie dezactivata)
-#define USE_SSL
+//#define USE_SSL
 
 //Tipurile de mesaje posibile
 enum class MessageType: uint8_t {

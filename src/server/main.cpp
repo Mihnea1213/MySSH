@@ -506,18 +506,108 @@ void sigchld_handler(int s)
     while(waitpid(-1,NULL,WNOHANG) > 0);
 }
 
+//Verificare user/parola din fisier text (Flat_file storage)
+bool check_credentials(const std::string& input_user, const std::string& input_pass)
+{
+    std::ifstream user_file("users.txt");
+    if(!user_file.is_open())
+    {
+        std::cerr << "[Eroare] Nu am gasit fisierul users.txt!\n";
+        return false;
+    }
+
+    std::string line_user, line_pass;
+    while (user_file >> line_user >> line_pass)
+    {
+        if(line_user == input_user && line_pass == input_pass)
+        {
+            return true; //Am gasit potrivirea
+        }
+    }
+    return false; //Nu am gasit
+}
+
 //Aceasta functie ruleaza in procesul COPIL creat in main()
-void handle_client(/*int client_sock*/ SSL* ssl, std::string client_ip)
+#ifdef USE_SSL
+void handle_client(SSL* ssl, std::string client_ip)
+#else
+void handle_client(int sock, std::string client_ip)
+#endif
 {
     MessageType type;
     std::string payload;
     std::cout << "[Child Process] Client conectat. Astept comenzi..."<< std::endl;
 
+    //AUTENTIFICARE
+    //Asteptam primul pachet sa fie neaparat AUTH_REQ
+    std::cout << "[Auth] Astept credențialele de la " << client_ip << "...\n";
+    
+    #ifdef USE_SSL
+    if(!receive_packet(ssl,type,payload))
+    {
+        return ;
+    }
+    #else
+    if(!receive_packet(sock,type,payload))
+    {
+        return ;
+    }
+    #endif
+
+    if (type != MessageType::AUTH_REQ)
+    {
+        std::cout << "[Auth] Eroare: Clientul nu a trimis cerere de autentificare.\n";
+        return;
+    }
+
+    //Parsam payload-ul (Format: "user password")
+    std::stringstream ss(payload);
+    std::string user, pass;
+    ss >> user >> pass;
+
+    if(user.empty() || pass.empty())
+    {
+        std::cout << "[Auth] Eroare: Format invalid (lipseste user sau parola).\n";
+        return;
+    }
+
+    //Verificam in baza de date (users.txt)
+    bool auth_success = check_credentials(user,pass);
+
+    if(auth_success)
+    {
+        std::cout << "[Auth] Succes! Utilizator conectat: " << user << "\n";
+        log_audit(client_ip, "AUTH", "Login successful as " + user);
+        #ifdef USE_SSL
+        send_packet(ssl , MessageType::AUTH_RESP, "OK");
+        #else
+        send_packet(sock , MessageType::AUTH_RESP, "OK");
+        #endif
+    }
+    else
+    {
+        std::cout << "[Auth] Eșec pentru " << client_ip << " (User: " << user << ")\n";
+        log_audit(client_ip, "AUTH", "Login failed for " + user);
+        #ifdef USE_SSL
+        send_packet(ssl , MessageType::AUTH_RESP, "FAIL");
+        #else
+        send_packet(sock , MessageType::AUTH_RESP, "FAIL");
+        #endif
+
+        return; //DEconectam clientul imediat
+    }
+
+    std::cout << "[Child Process] Sesiune activa. Astept comenzi..."<< std::endl;
+
     while (true)
     {
+        #ifdef USE_SSL
+        if(!receive_packet(ssl,type,payload))
+        #else
         //Folosim receive_packet 
         //Functia asta se ocupa de lungime si tip
-        if(!receive_packet(/*client_sock*/ ssl,type,payload))
+        if(!receive_packet(sock,type,payload))
+        #endif
         {
             std::cout << "[Child Process] Clientul s-a deconectat sau eroare protocol." << std::endl;
             log_audit(client_ip, "DISCONNECT", "Session ended");
@@ -576,23 +666,38 @@ void handle_client(/*int client_sock*/ SSL* ssl, std::string client_ip)
                 output="\n"; //Ca sa nu trimitem payload ul gol
             }
 
+            #ifdef USE_SSL
+            send_packet(ssl, MessageType::CMD_OUTPUT, output);
+            #else
             //Trimitem raspunsul inapoi impachetat
-            send_packet(/*client_sock*/ ssl, MessageType::CMD_OUTPUT, output);
+            send_packet(sock, MessageType::CMD_OUTPUT, output);
+            #endif
         }
     }
+    #ifdef USE_SSL
+    //Nu inchidem socketul aici, il inchide parintele sau SSL_shutdown
+    //Copilul moare oricum
+    #else
     //Inchidem socket-ul cand iesim din bucla
-    //close(client_sock);
+    close(sock);
     //Doar daca facem fara criptare
+    #endif
 }
 
 int main()
 {
+    #ifdef USE_SSL
     //Initializare OpenSSl
     Crypto::init();
 
     //Creare COntext Server + Incarcare CHei
     ctx = Crypto::create_context(true);
     Crypto::configure_context(ctx, "../keys/server_cert.pem", "../keys/server_key.pem");
+    std::cout << "[Info] Modul SECURIZE (SSL) Activat.\n";
+    #else
+    std::cout << "[Info] Modul NECRIPTAT (Standard TCP) Activat.\n";
+    #endif
+
     int server_fd, new_socket;
     struct sockaddr_in address;
     int opt = 1;
@@ -689,6 +794,7 @@ int main()
             //Copilul nu are nevoie sa asculte dupa alti clienti
             close(server_fd);
 
+            #ifdef USE_SSL
             //!!!START SSL HANDSHAKE (In copil)
             SSL* ssl = SSL_new(ctx); //Cream o structura SSL
             SSL_set_fd(ssl, new_socket); // O legam de socket
@@ -703,12 +809,14 @@ int main()
                 handle_client(ssl, ip_str);
             }
             //Copilul se ocupa doar de acest client
-            //handle_client(new_socket, std::string(ip_str)); ...asta daca lucram fara criptare
-
+            
             //Curatenie Copil
             SSL_shutdown(ssl);
             SSL_free(ssl);
             close(new_socket);
+            #else
+            handle_client(new_socket, std::string(ip_str)); //asta daca lucram fara criptare
+            #endif
             //Cand handle_client se termina, copilul moare
             exit(0);
         }
@@ -723,7 +831,9 @@ int main()
     }
 
     //Curatenie Parinte (teoretic unreachable code in while (true))
+    #ifdef USE_SSL
     SSL_CTX_free(ctx);
     Crypto::cleanup();
+    #endif
     return 0;
 }

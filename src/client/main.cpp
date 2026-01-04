@@ -75,7 +75,7 @@ int main()
     #ifdef USE_SSL
     //!!!Start Criptare (Handshake)
     //Cream o structura SSL specifica pentru aceasta conexiune
-    SSL* ssl = SSL_new(ctx);
+    ssl = SSL_new(ctx);
 
     //Legam structura SSL de socket-ul TCP existent
     SSL_set_fd(ssl, sock);
@@ -96,6 +96,66 @@ int main()
     std::cout << "[ATENTIE] Traficul poate fi interceptat!\n";
     #endif
 
+    //AUTENTIFICARE
+    std::string username, password;
+
+    std::cout << "Username: ";
+    std::getline(std::cin, username);
+
+    std::cout << "Password: ";
+    std::getline(std::cin, password);
+
+    //COnstruim payload-ul: "username password"
+    std::string auth_payload = username + " " + password;
+
+    #ifdef USE_SSL
+    if(!send_packet(ssl, MessageType::AUTH_REQ, auth_payload))
+    {
+        return -1;
+    }
+    #else
+    if(!send_packet(sock, MessageType::AUTH_REQ, auth_payload))
+    {
+        return -1;
+    }
+    #endif
+
+    //Asteptam raspunsul
+    MessageType auth_type;
+    std::string auth_response;
+
+    #ifdef USE_SSL
+    if(!receive_packet(ssl, auth_type, auth_response))
+    {
+        return -1;
+    }
+    #else
+    if(!receive_packet(sock, auth_type, auth_response))
+    {
+        return -1;
+    }
+    #endif
+
+    if(auth_type == MessageType::AUTH_RESP && auth_response == "OK")
+    {
+       std::cout << "\n[Succes] Autentificare reusita! Bun venit, " << username << ".\n"; 
+    }
+    else
+    {
+        std::cout << "\n[Eroare] User sau parola gresita! Serverul a inchis conexiunea.\n";
+
+        //Curatenie
+        #ifdef USE_SSL
+        if(ssl)
+        {
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+        }
+        #endif
+        close(sock);
+        return 0;
+    }  
+    
     std::cout << "Scrie comenzi shell (ex: ls, pwd). Scrie 'exit' pentru a iesi.\n";
 
     //Bucla de comunicare

@@ -1,0 +1,3 @@
+admin secret1234
+student tema
+mihnea 123456
