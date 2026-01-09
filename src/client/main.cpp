@@ -22,7 +22,7 @@
 
 //Adresa IP a serverului.
 //127.0.0.1 inseamna "acest calculator"
-#define SERVER_IP "127.0.0.1"
+#define SERVER_IP "192.168.163.105"
 
 // --- CULORI PENTRU TERMINAL ---
 const std::string RED     = "\033[31m";
